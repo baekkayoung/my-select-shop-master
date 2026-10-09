@@ -80,10 +80,15 @@ public class UserController {
     @GetMapping("/user/kakao/callback")
     public String kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         String token = kakaoService.kakaoLogin(code);
-        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        if (token != null) {
+            Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token.substring(7));
+            cookie.setPath("/");
+            response.addCookie(cookie);
 
+        }else{
+            log.error("토큰 발급 실패 또는 비어있음");
+            throw new IllegalArgumentException("토큰이 유효하지 않습니다.");
+        }
         return "redirect:/";
 
     }
